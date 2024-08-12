@@ -1,5 +1,6 @@
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.Color;
@@ -12,7 +13,7 @@ import java.util.Queue;
 public class GridDrawer extends JPanel {
     private Grid grid;
     private Queue<Point> mouseTrails;
-    private static final int TRAIL_LENGTH = 100; // Number of frames to keep trails
+    private static final int TRAIL_LENGTH = 50; // Number of frames to keep trails
 
     public GridDrawer() {
         grid = new Grid(20, 20, 35, 10);
@@ -37,15 +38,21 @@ public class GridDrawer extends JPanel {
             }
         });
 
-        // Timer to repaint at regular intervals
-        new javax.swing.Timer(16, e -> repaint()).start(); // Approximately 60 FPS
+        // Timer to repaint and update at regular intervals
+        new Timer(16, e -> {
+            updateTrails(); // Update trails every frame
+            repaint();
+        }).start(); // Approximately 60 FPS
     }
 
     private void addMouseTrail(Point mousePos) {
-        if (mouseTrails.size() >= TRAIL_LENGTH) {
-            mouseTrails.poll(); // Remove the oldest trail point
-        }
         mouseTrails.add(new Point(mousePos)); // Add the new point
+    }
+
+    private void updateTrails() {
+        if (mouseTrails.size() > TRAIL_LENGTH) {
+            mouseTrails.poll(); // Remove the oldest trail point if the queue exceeds TRAIL_LENGTH
+        }
     }
 
     @Override
