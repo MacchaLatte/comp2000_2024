@@ -13,7 +13,7 @@ import java.util.Queue;
 public class GridDrawer extends JPanel {
     private Grid grid;
     private Queue<Point> mouseTrails;
-    private static final int TRAIL_LENGTH = 50; // Number of frames to keep trails
+    private static final int TRAIL_LENGTH = 50; // Number of frames to keep trails (50 instead of 100)
 
     public GridDrawer() {
         grid = new Grid(20, 20, 35, 10);
