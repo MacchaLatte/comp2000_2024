@@ -6,20 +6,28 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class GridDrawer extends JPanel {
     private Grid grid;
+    private Queue<Point> mouseTrails;
+    private static final int TRAIL_LENGTH = 100; // Number of frames to keep trails
 
     public GridDrawer() {
         grid = new Grid(20, 20, 35, 10);
+        mouseTrails = new LinkedList<>();
+
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 Point mousePos = e.getPoint();
                 grid.highlightCell(mousePos);
+                addMouseTrail(mousePos); // Add the new mouse position to the trail
                 repaint();
             }
         });
+        
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -28,12 +36,30 @@ public class GridDrawer extends JPanel {
                 repaint();
             }
         });
+
+        // Timer to repaint at regular intervals
+        new javax.swing.Timer(16, e -> repaint()).start(); // Approximately 60 FPS
+    }
+
+    private void addMouseTrail(Point mousePos) {
+        if (mouseTrails.size() >= TRAIL_LENGTH) {
+            mouseTrails.poll(); // Remove the oldest trail point
+        }
+        mouseTrails.add(new Point(mousePos)); // Add the new point
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        // Draw the grid first
         grid.paint(g);
+
+        // Draw the mouse trails over the grid
+        g.setColor(new Color(0, 0, 0, 100)); // Semi-transparent black
+        for (Point p : mouseTrails) {
+            g.fillOval(p.x - 10, p.y - 10, 20, 20); // Draw circles with radius 10
+        }
     }
 
     @Override
@@ -42,7 +68,7 @@ public class GridDrawer extends JPanel {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Painting Grid");
+        JFrame frame = new JFrame("Painting Grid with Mouse Trails");
         GridDrawer gridDrawer = new GridDrawer();
 
         frame.add(gridDrawer);
